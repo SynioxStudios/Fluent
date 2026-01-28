@@ -1,52 +1,84 @@
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 
-local SynioxGui = Instance.new("ScreenGui")
-SynioxGui.Name = "SynioxHub_Custom"
-SynioxGui.Parent = CoreGui
-SynioxGui.ResetOnSpawn = false
+local Fluent = {}
 
-local Launcher = Instance.new("ImageButton")
-Launcher.Name = "Launcher"
-Launcher.Parent = SynioxGui
-Launcher.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Launcher.BackgroundTransparency = 0.3
-Launcher.BorderSizePixel = 0
-Launcher.Position = UDim2.new(0.02, 0, 0.45, 0)
-Launcher.Size = UDim2.new(0, 60, 0, 60)
-Launcher.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=420&height=420&assetId=129903125132641"
-Launcher.ZIndex = 10
+function Fluent:CreateWindow(Config)
+    local Title = Config.Title or "Syniox Hub"
+    local Size = Config.Size or UDim2.fromOffset(550, 380)
 
-local LauncherCorner = Instance.new("UICorner")
-LauncherCorner.CornerRadius = UDim.new(0, 30) -- Tam yuvarlak yapıldı
-LauncherCorner.Parent = Launcher
+    local SynioxGui = Instance.new("ScreenGui")
+    SynioxGui.Name = "SynioxHub"
+    SynioxGui.Parent = CoreGui
+    SynioxGui.ResetOnSpawn = false
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = SynioxGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.5, -275, 0.5, -190)
-MainFrame.Size = UDim2.new(0, 550, 0, 380) -- Mystery Hub boyutu
-MainFrame.Visible = false
-MainFrame.ClipsDescendants = true
+    local Launcher = Instance.new("ImageButton")
+    Launcher.Name = "Launcher"
+    Launcher.Parent = SynioxGui
+    Launcher.Size = UDim2.new(0, 60, 0, 60)
+    Launcher.Position = UDim2.new(0.02, 0, 0.45, 0)
+    Launcher.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Launcher.BackgroundTransparency = 0.3
+    Launcher.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=420&height=420&assetId=129903125132641"
+    
+    local LauncherCorner = Instance.new("UICorner")
+    LauncherCorner.CornerRadius = UDim.new(0, 30)
+    LauncherCorner.Parent = Launcher
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 10)
-MainCorner.Parent = MainFrame
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = SynioxGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    MainFrame.Size = Size
+    MainFrame.Position = UDim2.new(0.5, -Size.X.Offset/2, 0.5, -Size.Y.Offset/2)
+    MainFrame.Visible = false
+    MainFrame.ClipsDescendants = true
+    
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 10)
+    MainCorner.Parent = MainFrame
 
-local function ToggleGui()
-    if not MainFrame.Visible then
-        MainFrame.Size = UDim2.new(0, 0, 0, 380)
-        MainFrame.Visible = true
-        MainFrame:TweenSize(UDim2.new(0, 550, 0, 380), "Out", "Quad", 0.3, true)
-        TweenService:Create(Launcher, TweenInfo.new(0.2), {ImageTransparency = 0.5}):Play()
-    else
-        MainFrame:TweenSize(UDim2.new(0, 0, 0, 380), "In", "Quad", 0.3, true, function()
-            MainFrame.Visible = false
-            TweenService:Create(Launcher, TweenInfo.new(0.2), {ImageTransparency = 0}):Play()
-        end)
-    end
+    Launcher.MouseButton1Click:Connect(function()
+        if not MainFrame.Visible then
+            MainFrame.Visible = true
+            MainFrame:TweenSize(Size, "Out", "Quad", 0.3, true)
+        else
+            MainFrame:TweenSize(UDim2.new(0, 0, 0, Size.Y.Offset), "In", "Quad", 0.3, true, function()
+                MainFrame.Visible = false
+            end)
+        end
+    end)
+
+    local dragging, dragInput, dragStart, startPos
+    MainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    end)
+
+    return {
+        AddTab = function(self, tConfig)
+            return {
+                AddToggle = function() return {OnChanged = function() end} end,
+                AddButton = function() end
+            }
+        end
+    }
 end
 
-Launcher.MouseButton1Click:Connect(ToggleGui)
+function Fluent:Notify(Data)
+end
+
+return Fluent
