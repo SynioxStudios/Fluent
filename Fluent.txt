@@ -1,13 +1,11 @@
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
--- 1. ANA SCREEN GUI
 local SynioxGui = Instance.new("ScreenGui")
 SynioxGui.Name = "SynioxHub_Custom"
 SynioxGui.Parent = CoreGui
 SynioxGui.ResetOnSpawn = false
 
--- 2. KÜÇÜK RESİMLİ AÇILIŞ BUTONU
 local Launcher = Instance.new("ImageButton")
 Launcher.Name = "Launcher"
 Launcher.Parent = SynioxGui
@@ -20,45 +18,31 @@ Launcher.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=420&height=420&
 Launcher.ZIndex = 10
 
 local LauncherCorner = Instance.new("UICorner")
-LauncherCorner.CornerRadius = UDim.new(0, 15)
+LauncherCorner.CornerRadius = UDim.new(0, 30) -- Tam yuvarlak yapıldı
 LauncherCorner.Parent = Launcher
 
--- 3. ANA PANEL (Büyük Menü)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = SynioxGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
-MainFrame.Size = UDim2.new(0, 500, 0, 350)
-MainFrame.Visible = false -- Başlangıçta gizli
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -275, 0.5, -190)
+MainFrame.Size = UDim2.new(0, 550, 0, 380) -- Mystery Hub boyutu
+MainFrame.Visible = false
 MainFrame.ClipsDescendants = true
 
 local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = MainFrame
 
--- Başlık Çubuğu
-local TitleBar = Instance.new("TextLabel")
-TitleBar.Size = UDim2.new(1, 0, 0, 40)
-TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-TitleBar.Text = "  SYNIOX HUB"
-TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleBar.TextXAlignment = Enum.TextXAlignment.Left
-TitleBar.Font = Enum.Font.GothamBold
-TitleBar.TextSize = 18
-TitleBar.Parent = MainFrame
-
--- 4. AÇILIŞ / KAPANIŞ ANİMASYONU
 local function ToggleGui()
-    if MainFrame.Visible == false then
-        MainFrame.Size = UDim2.new(0, 0, 0, 350) -- Animasyon başlangıcı
+    if not MainFrame.Visible then
+        MainFrame.Size = UDim2.new(0, 0, 0, 380)
         MainFrame.Visible = true
-        MainFrame:TweenSize(UDim2.new(0, 500, 0, 350), "Out", "Quad", 0.3, true)
-        
-        -- Buton efekt
+        MainFrame:TweenSize(UDim2.new(0, 550, 0, 380), "Out", "Quad", 0.3, true)
         TweenService:Create(Launcher, TweenInfo.new(0.2), {ImageTransparency = 0.5}):Play()
     else
-        MainFrame:TweenSize(UDim2.new(0, 0, 0, 350), "In", "Quad", 0.3, true, function()
+        MainFrame:TweenSize(UDim2.new(0, 0, 0, 380), "In", "Quad", 0.3, true, function()
             MainFrame.Visible = false
             TweenService:Create(Launcher, TweenInfo.new(0.2), {ImageTransparency = 0}):Play()
         end)
@@ -66,32 +50,3 @@ local function ToggleGui()
 end
 
 Launcher.MouseButton1Click:Connect(ToggleGui)
-
--- 5. SÜRÜKLENEBİLİR YAPMA (Draggable)
-local UserInputService = game:GetService("UserInputService")
-local dragging, dragInput, dragStart, startPos
-
-local function update(input)
-    local delta = input.Position - dragStart
-    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-end
-
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
-        update(input)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
