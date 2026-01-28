@@ -1,0 +1,73 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local TweenService = game:GetService("TweenService")
+
+-- 1. SYNIOX HUB ANA PENCERE AYARLARI
+local Window = Fluent:CreateWindow({
+    Title = "Syniox Hub",
+    SubTitle = "Muscle Legends",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true, 
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Menü ilk başta kapalı başlar
+Window:Minimize() 
+
+-- Sekmeler
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "home" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+-- 2. ÖZEL RESİMLİ BAŞLATICI BUTONU
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SynioxLauncherGui"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ResetOnSpawn = false
+
+local ImageButton = Instance.new("ImageButton")
+ImageButton.Name = "LauncherBtn"
+ImageButton.Parent = ScreenGui
+ImageButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ImageButton.BackgroundTransparency = 0.2
+ImageButton.Position = UDim2.new(0.02, 0, 0.45, 0)
+ImageButton.Size = UDim2.new(0, 60, 0, 60)
+ImageButton.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=420&height=420&assetId=129903125132641"
+ImageButton.Draggable = true 
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = ImageButton
+
+-- 3. ANİMASYONLU AÇILIŞ FONKSİYONU
+local function OpenGui()
+    -- Tıklama Efekti (Hafif küçülüp büyüme)
+    local shrink = TweenService:Create(ImageButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 52, 0, 52)})
+    local expand = TweenService:Create(ImageButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 60, 0, 60)})
+    
+    shrink:Play()
+    shrink.Completed:Connect(function() expand:Play() end)
+
+    -- Fluent Menüsünü Tetikle
+    Window:Minimize() 
+end
+
+ImageButton.MouseButton1Click:Connect(OpenGui)
+
+-- 4. ÖRNEK ÖZELLİKLER (Görseldeki gibi)
+Tabs.Main:AddParagraph({
+    Title = "Welcome to Syniox",
+    Content = "Select your features from the menu."
+})
+
+Tabs.Main:AddToggle("AutoLift", {Title = "Auto Lift", Default = false})
+Tabs.Main:AddToggle("FastTools", {Title = "Fast Tools", Default = false})
+
+-- Başlangıç Bildirimi
+Fluent:Notify({
+    Title = "Syniox Hub",
+    Content = "Script is active. Use the icon to open menu.",
+    Duration = 5
+})
