@@ -34,7 +34,7 @@ function Fluent:CreateWindow(Config)
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = SynioxGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    MainFrame.Size = UDim2.new(0, 650, 0, 420)
+    MainFrame.Size = UDim2.new(0, 400, 0, 420)
     MainFrame.Position = UDim2.new(0.5, -325, 0.5, -210)
     MainFrame.BorderSizePixel = 0
     MainFrame.Visible = false
